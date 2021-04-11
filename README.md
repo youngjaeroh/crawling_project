@@ -24,7 +24,10 @@
 
 ## 코드구성
 
+* 마지막페이지를 찾고, 마지막페이지까지 해당직종의 목록을 title,company,location,apply_link로 각각 저장
+
 ![6](https://user-images.githubusercontent.com/76992049/114297452-b6374680-9aeb-11eb-9cd3-53d38d0c356a.JPG)
 
+* flask를 사용하여 웹사이트를 만들고 export하면 csv파일로 저장
 
 ![7](https://user-images.githubusercontent.com/76992049/114297456-b899a080-9aeb-11eb-9ea9-b87421e3ea08.JPG)
