@@ -26,7 +26,56 @@
 
 * 마지막페이지를 찾고, 마지막페이지까지 해당직종의 목록을 title,company,location,apply_link로 각각 저장
 
-![6](https://user-images.githubusercontent.com/76992049/114297452-b6374680-9aeb-11eb-9cd3-53d38d0c356a.JPG)
+<pre><code>
+import requests
+from bs4 import BeautifulSoup
+
+
+
+def get_last_page(url):
+    result = requests.get(url)
+    soup = BeautifulSoup(result.text, "html.parser")
+    pages = soup.find("div", {"class": "s-pagination"}).find_all("a")
+    last_page = pages[-2].get_text(strip=True)
+    return int(last_page)
+
+
+def extract_job(html):
+    title = html.find("h2", {"class": "mb4"}).find("a")["title"]
+    company, location = html.find("h3", {
+        "class": "mb4"
+    }).find_all("span", recursive=False)
+    company = company.get_text(strip=True)
+    location = location.get_text(strip=True)
+    job_id = html['data-jobid']
+    return {
+        'title': title,
+        'company': company,
+        'location': location,
+        "apply_link": f"https://stackoverflow.com/jobs/{job_id}"
+    }
+
+
+def extract_jobs(last_page,url):
+    jobs = []
+    for page in range(last_page):
+        print(f"Scrapping SO: Page: {page}")
+        result = requests.get(f"{url}&pg={page+1}")
+        soup = BeautifulSoup(result.text, "html.parser")
+        results = soup.find_all("div", {"class": "-job"})
+        for result in results:
+            job = extract_job(result)
+            jobs.append(job)
+    return jobs
+
+
+def get_jobs(word):
+    url = f"https://stackoverflow.com/jobs?q={word}&sort=i"
+    last_page = get_last_page(url)
+    jobs = extract_jobs(last_page,url)
+    return jobs
+
+</code></pre>
 
 * flask를 사용하여 웹사이트를 만들고 export하면 csv파일로 저장
 
