@@ -22,8 +22,9 @@
 
 ![5](https://user-images.githubusercontent.com/76992049/114296997-301a0080-9ae9-11eb-9034-491f8122c5cc.JPG)
 
-## H2, 부제목                            
-### H3, 소제목
-#### H4, 제목4
-##### H5, 제목5
-###### H6, 제목6
+## 코드구성
+
+![6](https://user-images.githubusercontent.com/76992049/114297452-b6374680-9aeb-11eb-9cd3-53d38d0c356a.JPG)
+
+
+![7](https://user-images.githubusercontent.com/76992049/114297456-b899a080-9aeb-11eb-9ea9-b87421e3ea08.JPG)
