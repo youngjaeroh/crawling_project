@@ -30,16 +30,13 @@
 import requests
 from bs4 import BeautifulSoup
 
-
-
 def get_last_page(url):
     result = requests.get(url)
     soup = BeautifulSoup(result.text, "html.parser")
     pages = soup.find("div", {"class": "s-pagination"}).find_all("a")
     last_page = pages[-2].get_text(strip=True)
     return int(last_page)
-
-
+    
 def extract_job(html):
     title = html.find("h2", {"class": "mb4"}).find("a")["title"]
     company, location = html.find("h3", {
@@ -55,7 +52,6 @@ def extract_job(html):
         "apply_link": f"https://stackoverflow.com/jobs/{job_id}"
     }
 
-
 def extract_jobs(last_page,url):
     jobs = []
     for page in range(last_page):
@@ -68,15 +64,57 @@ def extract_jobs(last_page,url):
             jobs.append(job)
     return jobs
 
-
 def get_jobs(word):
     url = f"https://stackoverflow.com/jobs?q={word}&sort=i"
     last_page = get_last_page(url)
     jobs = extract_jobs(last_page,url)
     return jobs
-
 </code></pre>
 
 * flask를 사용하여 웹사이트를 만들고 export하면 csv파일로 저장
 
-![7](https://user-images.githubusercontent.com/76992049/114297456-b899a080-9aeb-11eb-9ea9-b87421e3ea08.JPG)
+<pre><code>
+from flask import Flask, render_template, request, redirect, send_file
+from scrapper import get_jobs
+from exporter import save_to_file
+
+app = Flask("SuperScrapper")
+
+db = {}
+
+@app.route("/")
+def home():
+  return render_template("potato.html")
+
+@app.route("/report")
+def report():
+  word = request.args.get("word")
+  if word:
+    word = word.lower()
+    existingJobs = db.get(word)
+    if existingJobs:
+      jobs = existingJobs
+    else:
+      jobs = get_jobs(word)
+      db[word] = jobs
+  else:
+      return redirect("/")
+  return render_template("report.html",searchingBy=word,resultsNumber=len(jobs),jobs=jobs)
+
+@app.route("/export")
+def export():
+  try:
+    word = request.args.get("word")
+    if not word:
+      raise Exception()
+    word = word.lower()
+    jobs = db.get(word)
+    if not jobs:
+      raise Exception()
+    save_to_file(jobs)
+    return send_file("jobs.csv", mimetype='text/csv',attachment_filename='summary_report.csv',as_attachment=True)
+  except:
+    return redirect("/")
+
+app.run(host="0.0.0.0")
+</code></pre>
